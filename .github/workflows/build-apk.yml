@@ -16,8 +16,19 @@ jobs:
         with:
           flutter-version: "3.22.0"
           channel: stable
+      - name: Create Flutter project structure
+        run: flutter create --project-name medical_transcriber .
+      - name: Copy lib files
+        run: |
+          cp -r lib/* /tmp/lib_backup/ 2>/dev/null || true
+          mkdir -p /tmp/lib_backup
+          cp -r lib/. /tmp/lib_backup/
+          flutter create --project-name medical_transcriber .
+          cp -r /tmp/lib_backup/. lib/
       - run: flutter pub get
-      - run: flutter build apk --release --dart-define=API_BASE_URL=https://medical-transcriber-api-allowedorigins.up.railway.app/api/v1
+      - run: |
+          flutter build apk --release \
+            --dart-define=API_BASE_URL=https://medical-transcriber-api-allowedorigins.up.railway.app/api/v1
       - uses: actions/upload-artifact@v4
         with:
           name: medical-transcriber-apk
